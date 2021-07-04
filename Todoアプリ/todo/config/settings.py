@@ -21,7 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'z@vs!oc$+ip7af&w61nf$$$ykzpm%-%3j-3@q19ow-pgfr!2a!'
+#SECRET_KEY = 'z@vs!oc$+ip7af&w61nf$$$ykzpm%-%3j-3@q19ow-pgfr!2a!'
+# 修正後
+try:
+    from .local_settings import *
+except ImportError:
+    pass
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,6 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # dajngo-allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.gitlab',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +143,34 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+# sitesフレームワーク用のサイトID
+SITE_ID = 1
+
+# 認証バックエンドを設定
+AUTHENTICATION_BACKENDS = (
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# 認証方式を 「メールアドレスとパスワード」 に変更
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+# ユーザー名は使用しない
+ACCOUNT_USERNAME_REQUIRED = False
+
+# ユーザー登録確認メールは送信しない
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# メールアドレスを必須項目にする
+ACCOUNT_EMAIL_REQUIRED = True
+
+# ログイン時のリダイレクト先
+LOGIN_REDIRECT_URL = 'todo:todo_list'
+
+# ログアウト時のリダイレクト先
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
+ACCOUNT_LOGOUT_ON_GET = True
+
+# メール送信の設定
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
